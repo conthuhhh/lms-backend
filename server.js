@@ -41,9 +41,20 @@ io.on('connection', (socket) => {
 app.use(helmet());
 
 // --- CORS ---
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://lms-frontend-five-red.vercel.app',
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173',   // Vite dev server
-  credentials: true,                   // Cho phép gửi nhận cookie
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS: ' + origin));
+    }
+  },
+  credentials: true,
 }));
 
 // --- Cookie parser (đọc csrf_secret từ cookie) ---
